@@ -31,6 +31,6 @@ app.get("*",(req,res)=>{
 
 app.listen(port, ()=> console.log(`server is running at http://localhost:${port}`));
 
-setInterval(()=>{
-    console.log(".");
-},5000)
+// setInterval(()=>{
+//     console.log(".");
+// },5000)
