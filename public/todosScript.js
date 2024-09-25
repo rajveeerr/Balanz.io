@@ -1,4 +1,4 @@
-let url="https://balanz-io-1.onrender.com";
+let url="https://balanz-io.vercel.app";
 let tasks = [];
 // tasks=[
 //     {
