@@ -25,6 +25,11 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #ebe9df;
+  background: rgba(22 22 22 .7);
+    /* background: linear-gradient(rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); */
+    border-radius: 100px;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
   
   .stylize{
