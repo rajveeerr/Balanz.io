@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanz.io</title>
+    <link rel="icon" type="image/x-icon" href="/faviconLogo.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://kit.fontawesome.com/b6fe51c8e7.js" crossorigin="anonymous"></script>
+    <!-- <script src="/todosScript.js"></script> -->
+     <link rel="stylesheet" href="/signupStyle.css">
+</head>
+<body>
+
+    <div id="popup-modal" class="popup-modal">
+        <p id="popup-message"></p>
+    </div>
+    <div class="navbar">
+        <div class="logo"><a href="/"><span class="b">B</span>Balanz<span class="stylize">.</span><span style="">io</span></a></div>
+        <div class="socials">
+            <a href="/login" target="_blank" class="github-btn"><i class="fa-solid fa-right-to-bracket"></i> LogIn</a>
+            <a href="/todos" target="_blank" class="twitter-btn"><i class="fa-solid fa-notes-medical"></i> Get Started</a>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-section">
+            <div class="login-section-title">
+                <h1>Sign Up</h1>
+            </div>
+            <div class="form">
+                <span type="text" class="error"><i class="fa-solid fa-circle-exclamation"></i><span id="err"></span></span>
+                <form onsubmit="signup(event)">
+                <label class="name">Enter Your Name</label>
+                <input type="text" placeholder="Enter Username" id="signupName" minlength="3" maxlength="20" required>
+                <label class="username">Create Username</label>
+                <input type="text" placeholder="Create Username" id="signupUsername" minlength="3" maxlength="20" required>
+                
+                
+                <label class="username">Create Password</label>
+                <div class="password-field">
+                    <input type="password" placeholder="Create Password" id="signupPass" required>
+                    <span  onclick="passwordToggle()" class="show-password-btn"><i id="icon" class="fa-regular fa-eye"></i></span>
+                </div>
+                <button>Sign Up</button>
+            </form>
+            <button onclick="loginasGuest()" class="guest-btn">Login as Guest</button>
+            <p class="signup-redirect">Already a User? <a href="/login" onclick="redirectSignup()">LogIn!</a></p>
+        </div>
+        </div>
+        <div class="img-container">
+            <img src="/uipreview.jpeg">
+        </div>
+    </div>
+
+
+
+
+
+    <footer>
+        <div class="footer-logo nav-logo">
+            <div class="logo">
+                <a href="/"><span class="b">B</span>Balanz<span class="stylize">.</span><span>io</span></a>
+            </div>
+        </div>
+        <div class="footer-description">
+            Built with <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist.png" alt="Man Technologist" width="25" height="25" /> by <span class="creator">Rajveer Singh</span>, the mind behind <a href="https://atmosonic.netlify.app" target="_blank" class="CodeCraft">AtmoSonic</a>.
+        </div>
+        <div class="social-icons">
+            <a href="https://github.com/rajveeerr" target="_blank"><i class="fa-brands fa-square-github"></i></a>
+            <a href="https://x.com/RajveeerrSingh" target="_blank"><i class="fa-brands fa-square-x-twitter"></i></a>
+        </div>
+    </footer>
+
+
+    <script>
+        let url="http://localhost:10000";
+
+        function randomUsername(){
+            let username=''
+            charOptions=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9','a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',  'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+            for(let i=0;i<8;i++){
+                username+=charOptions[Math.floor(Math.random() * charOptions.length)];
+            }
+            return username;
+        }
+
+
+        async function signup(event){
+            event.preventDefault();
+            username=document.getElementById("signupUsername").value;
+            if(!isValidUsername(username)){
+                // alert("Userrname can contain only alphanumeric characters and underscore")
+                label=document.getElementsByClassName("error")[0];
+                label.style.display="flex";
+                labeltxt=document.getElementById("err");
+                labeltxt.innerText="Userrname can contain only Alphanumeric characters and Underscore";
+                // labeltxt.innerText=e.response.data.message; 
+                return
+            }
+            name=document.getElementById("signupName").value;
+            if(!isValidName(username)){
+                alert("Name can contain only Alphabetic characters and Space")
+                label=document.getElementsByClassName("error")[0];
+                label.style.display="flex";
+                labeltxt=document.getElementById("err");
+                labeltxt.innerText="Name can contain only Alphabetic characters and Space";
+                return
+            }
+            pass=document.getElementById("signupPass").value;
+            try{
+                let response=await axios.post(`${url}/signup`,{
+                    username: username,
+                    name: name,
+                    password: pass
+                })
+                let signupStatus=response.data;
+                localStorage.setItem("token",signupStatus.token);
+                alert(signupStatus.message+signupStatus.profileImg+" Redirecting you to todos page");
+                window.location.href="/todos"
+
+            }
+            catch(e){
+                // alert(e.response.data.message)
+                label=document.getElementsByClassName("error")[0];
+                label.style.display="flex";
+                labeltxt=document.getElementById("err");
+                labeltxt.innerText=""
+                labeltxt.innerText=e.response.data.message; 
+            }
+        }
+
+        async function loginasGuest(){
+            username=randomUsername();
+            name="Guest";
+            pass="123";
+            try{
+                let response=await axios.post(`${url}/signup`,{
+                    username: username,
+                    name: name,
+                    password: pass
+                })
+                let signupStatus=response.data;
+                localStorage.setItem("token",signupStatus.token);
+                alert(signupStatus.message+signupStatus.profileImg+" Redirecting you to todos page");
+                window.location.href="/todos"
+            }
+            catch(e){
+                // alert(e.response.data.message)
+                label=document.getElementsByClassName("error")[0];
+                label.style.display="flex";
+                labeltxt=document.getElementById("err");
+                labeltxt.innerText=""
+                labeltxt.innerText=e.response.data.message; 
+            }
+        }
+
+        function passwordToggle(){
+            passwordInput=document.getElementById("signupPass");
+            icon=document.getElementById("icon");
+            
+            if (passwordInput.type==="password"){
+                passwordInput.type="text";
+                icon.classList.add("fa-eye-slash");
+                icon.classList.remove("fa-eye");
+            }
+            else{
+                passwordInput.type="password";
+                icon.classList.add("fa-eye");
+                icon.classList.remove("fa-eye-slash");
+            }
+        }
+        function isValidName(name){
+            const regex = /^[a-zA-Z ]+$/;
+            return regex.test(name);
+        }
+        function isValidUsername(username){
+            const regex = /^[a-zA-Z0-9_]+$/;
+            return regex.test(username);
+        }
+    </script>
+</body>
+</html>

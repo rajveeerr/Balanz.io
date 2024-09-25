@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanz.io</title>
+    <link rel="icon" type="image/x-icon" href="/faviconLogo.png">
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="https://kit.fontawesome.com/b6fe51c8e7.js" crossorigin="anonymous"></script>
+    <script src="/todosScript.js"></script>
+</head>
+<body>
+
+    <div class="loading">
+        <div class="logo"><a href="/"><span class="b">B</span>Balanz<span class="stylize">.</span><span style="">io</span></a></div>
+        <div class="loader"></div>
+    </div>
+
+
+    <div class="navbar">
+        <div class="logo"><a href="/"><span class="b">B</span>Balanz<span class="stylize">.</span><span style="">io</span></a></div>
+        <div class="socials">
+            <a href="https://x.com/RajveeerrSingh" target="_blank" class="twitter-btn"><i class="fa-brands fa-x-twitter"></i> Twitter</a>
+            <a href="https://github.com/rajveeerr" target="_blank" class="github-btn"><i class="fa-brands fa-github"></i> Github</a>
+        </div>
+    </div>
+    <div id="hamberger" class="hamberger">
+        <i class="fa-solid fa-arrow-right-arrow-left" onclick="collapse()"></i>
+    </div>
+
+    <div id="logoutModal" class="logout-modal">
+        <div class="modal-content-logout">
+          <p>Are you sure you want to logout?</p>
+          <div class="modal-buttons">
+            <button onclick="logout()" class="logout-btn">Yes, Logout</button>
+            <button onclick="closeModal()" class="logout-btn cancel-btn">Cancel</button>
+          </div>
+        </div>
+    </div>
+
+    <div id="popup-modal" class="popup-modal">
+        <p id="popup-message"></p>
+    </div>
+    
+    
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+          <!-- <h2>Task Details</h2> -->
+          
+          <form id="task-form" onsubmit="addTask(event)">
+              <h4 class="task-title" id="modalTitle" style="margin: .4rem 0;"></h4>
+            <input type="text" id="task-title" name="title" placeholder="Create new task" required />
+      
+            <textarea id="task-desc" name="description" placeholder="Add your Notes(optional)"></textarea>
+
+            <div class="add-metadata">
+            
+                <input type="date" placeholder="Enter The Due Date of the Task" id="due-date" name="due-date" required />
+        
+                <select id="priority" name="priority" required>
+                <option value="" disabled selected>Add Priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                </select>
+        
+                <select id="status" required>
+                    <option value="" disabled selected>Select status of Task</option>
+                    <option value="todo">To Do</option>
+                    <option value="pending">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+
+            
+                <input list="category-list" id="category-input" name="category" placeholder="Select or Create Category" required>
+                <datalist id="category-list">
+                    <option value="Work"></option>
+                    <option value="Personal"></option>
+                </datalist>
+            </div>
+            
+      
+            
+
+            <div class="add-modal-btns">
+                <button class="cancel-btn-add-modal" onclick="closeAddEditModal()">Cancel</button>
+                <button class="submit-btn" onclick="saveAddEditModal()">Save Task</button>
+            </div>
+
+        </form>
+        </div>
+      </div>
+      
+
+
+    <div class="container">
+        <aside id="sidebar" class="sidebar">
+
+            <div class="sidebar-header">
+                <div class="user-info" onclick="logoutMenu()">
+                    <img class="profileImg" src="/3.jpg" id="profileImg"><div class="acc-details">
+                        <p class="name" id="profileName">Jane Doe</p>
+                        <p class="username" id="username">@letsdothis</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-right-arrow-left" onclick="collapse()"></i>
+            </div>
+          
+            <div class="menu">
+                <div class="add-task-btn menu-item" onclick="openAddEditModal('add')">Add Task<i class="fa-solid fa-circle-plus"></i></div>
+                <div class="all-task menu-item active"><div><i class="fa-regular fa-calendar-check"></i> All Tasks</div></div>
+                <div class="completed-task menu-item disabled" ><div><i class="fa-solid fa-square-check" style="color: #05a571;"></i> Completed</div> <span style="font-size: .6rem; align-items: flex-end;color: #555;">Not Added</span></div>
+                <div class="pending-task menu-item disabled"><div><i class="fa-solid fa-hourglass-half" style="color: #36a8fa;"></i> In Progress</div><span style="font-size: .6rem; align-items: flex-end;color: #555">Not Added</span></div>
+            </div>
+
+            <div class="logout" onclick="openModal()">
+                <a class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+
+        </aside>
+    
+
+        <main class="main-content">
+          <!-- <section class="task-input">
+            <input type="text" placeholder="Add a new task" class="new-task-input">
+            <button class="add-task-btn">Add</button>
+          </section>
+    
+          <section class="task-list">
+            <div class="task-item">
+              <input type="checkbox">
+              <div class="task-details">
+                <span class="task-title">Complete the UI design</span>
+                <span class="task-date">Due Tomorrow</span>
+              </div>
+            </div>
+    
+            <div class="task-item">
+              <input type="checkbox">
+              <div class="task-details">
+                <span class="task-title">Review project milestones</span>
+                <span class="task-date">Due in 3 Days</span>
+              </div>
+            </div>
+    
+            <div class="task-item">
+              <input type="checkbox">
+              <div class="task-details">
+                <span class="task-title">Submit final report</span>
+                <span class="task-date">Due Next Week</span>
+              </div>
+            </div>
+          </section> -->
+
+
+          <div class="main-content">
+            <div class="top-bar">
+                <div class="main-header">
+                    <div class="greeting" id="greeting"></div>
+                    <div class="date" id="displayDate"></div>
+                    <div id="sync-txt" class="sync-txt">
+                        <div id="sync"><div class="loader"></div> Saving Changes</div>
+                    </div>
+                </div>
+            
+                
+                <div class="filter-section">
+                    <div class="dropdown">
+                        <button class="dropbtn filter-btn">Filter Options <i class="fa-solid fa-arrow-up-wide-short"></i></button>
+                        <div class="dropdown-content">
+                            <a onclick="sortTasks('priority')">Sort by Priority</a>
+                            <a onclick="sortTasks('dueDate')">Sort by Due Date</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        
+            
+            <div class="kanban-board">
+    
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <h3><i class="fa-regular fa-calendar-check" style="color: #7e3eee;"></i> All To-Dos</h3>
+                        <div class="add" onclick="openAddEditModal('add')">
+                            Add Task
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </div>
+                    </div>
+                    <div class="kanban-tasks" id="todo-column">
+                    </div>
+                </div>
+        
+
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <h3><i class="fa-solid fa-hourglass-half" style="color: #36a8fa;"></i> In Progress</h3>
+                        <div class="add" onclick="openAddEditModal('add')">
+                            Add Task
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </div>
+                    </div>
+                    <div class="kanban-tasks" id="inprogress-column">
+     
+                    </div>
+                </div>
+        
+
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <h3><i class="fa-solid fa-square-check" style="color: #05a571;"></i> Done</h3>
+                        <div class="add" onclick="openAddEditModal('add')">
+                            Add Task
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </div>
+                    </div>
+                    <div class="kanban-tasks" id="done-column">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+       <!-- <template id="task-template">
+            <div class="task-card" id="sdc">
+                <div class="task-card-header">
+                    <p class="task-status complete"></p>
+                    <span class="edit-section">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                        <div class="edit-dropdown">
+                            <button class="edit-task-btn" onclick="openAddEditModal('edit','taskid')"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                            <button class="delete-task-btn" onclick="deleteTask('taskid')"><i class="fa-solid fa-trash"></i></i> Delete</button>
+                        </div>
+                    </span>
+                </div>
+                <h4 class="task-title"></h4>
+                <p class="task-desc"></p>
+                <div class="task-metadata">
+                    <p class="task-due"><i class="fa-regular fa-calendar"></i><span></span></p>
+                    <p class="task-priority"><i class="fa-solid fa-angles-up"></i>Priority<span></span></p>
+                    <p class="task-category"><span></span></p>
+                </div>
+                <button id="markComplete" class="mark-complete"><i class="fa-solid fa-check-double"></i> Mark as Complete</button>
+            </div>
+        </template> -->
+        
+
+
+
+
+        </main>
+    </div>
+</body>
+</html>
