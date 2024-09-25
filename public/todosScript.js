@@ -348,7 +348,7 @@ async function loggedin(){
         
         profileName.innerText=capitalize(userData.name);
         username.innerText=`@${(userData.username).toLowerCase()}`;
-        profileImg.setAttribute("src",userData.profileImg)
+        profileImg.setAttribute("src",`./${userData.profileImg}`)
         displayGreeting(capitalize(userData.name));
         displayDate();
         
