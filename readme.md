@@ -11,8 +11,6 @@ The backend is hosted on Render for free, so the app might load slower than expe
 
 <img width="1280" alt="Screenshot 2024-09-26 at 12 03 25 AM" src="https://github.com/user-attachments/assets/0ab6a733-588f-415b-b2de-61dae10a8fce">
 
-<img width="1280" alt="Screenshot 2024-09-26 at 12 04 24 AM" src="https://github.com/user-attachments/assets/81031f6f-fd42-48f1-8764-fe5b0b01e34b">
-
 <img width="1280" alt="Screenshot 2024-09-26 at 12 03 05 AM" src="https://github.com/user-attachments/assets/94bac38e-8e1c-4e83-a16d-aa3cb8e231cd">
 
 
