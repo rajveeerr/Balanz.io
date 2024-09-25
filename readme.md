@@ -2,8 +2,7 @@
 
 Balanz.io is more than just a task manager—it's a smart task management system designed to help you maintain a work-life balance. The app focuses on tracking, managing, and completing tasks in a minimalistic and engaging way.
 
-## 🌐 Live Demo: https://balanz-io-01.onrender.com/
-The backend is hosted on Render for free, so the app might load slower than expected at times.
+### 🌐 Live Here: https://balanz-io-01.onrender.com/
 
 ## 📷 Screenshots
 
