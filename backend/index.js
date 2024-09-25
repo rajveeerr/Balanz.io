@@ -10,12 +10,10 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
-const corsOptions = {
-    origin: '*',
-    credentials: true,
-};
 
-app.use(cors(corsOptions));
+app.use(cors({
+    donains: ["https://balanz-io.vercel.app/login","https://balanz-io.vercel.app/signup","https://balanz-io.vercel.app","https://balanz-io.vercel.app/todos"];
+        ));
 app.use(express.static(path.join(__dirname,'../public')));
 
 app.use(userRoutes);
