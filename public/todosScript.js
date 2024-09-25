@@ -1,4 +1,4 @@
-let url="http://localhost:10000";
+let url="https://balanz-io-1.onrender.com";
 let tasks = [];
 // tasks=[
 //     {
