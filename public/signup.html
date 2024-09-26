@@ -32,7 +32,7 @@
                 <span type="text" class="error"><i class="fa-solid fa-circle-exclamation"></i><span id="err"></span></span>
                 <form onsubmit="signup(event)">
                 <label class="name">Enter Your Name</label>
-                <input type="text" placeholder="Enter Username" id="signupName" minlength="3" maxlength="20" required>
+                <input type="text" placeholder="Enter Name" id="signupName" minlength="3" maxlength="20" required>
                 <label class="username">Create Username</label>
                 <input type="text" placeholder="Create Username" id="signupUsername" minlength="3" maxlength="20" required>
                 
@@ -100,7 +100,7 @@
             }
             name=document.getElementById("signupName").value;
             if(!isValidName(username)){
-                alert("Name can contain only Alphabetic characters and Space")
+                alert("Name can contain only Alphabetic Characters and Space no Numbers Allowed!")
                 label=document.getElementsByClassName("error")[0];
                 label.style.display="flex";
                 labeltxt=document.getElementById("err");
