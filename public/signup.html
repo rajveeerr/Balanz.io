@@ -90,21 +90,19 @@
             event.preventDefault();
             username=document.getElementById("signupUsername").value;
             if(!isValidUsername(username)){
-                // alert("Userrname can contain only alphanumeric characters and underscore")
                 label=document.getElementsByClassName("error")[0];
                 label.style.display="flex";
                 labeltxt=document.getElementById("err");
-                labeltxt.innerText="Userrname can contain only Alphanumeric characters and Underscore";
+                labeltxt.innerText="Username can contain only Alphanumeric characters and Underscore";
                 // labeltxt.innerText=e.response.data.message; 
                 return
             }
             name=document.getElementById("signupName").value;
-            if(!isValidName(username)){
-                alert("Name can contain only Alphabetic Characters and Space no Numbers Allowed!")
+            if(!isValidName(name)){
                 label=document.getElementsByClassName("error")[0];
                 label.style.display="flex";
                 labeltxt=document.getElementById("err");
-                labeltxt.innerText="Name can contain only Alphabetic characters and Space";
+                labeltxt.innerText="Name can contain only Alphabetic Characters and Space no Numbers Allowed!";
                 return
             }
             pass=document.getElementById("signupPass").value;
