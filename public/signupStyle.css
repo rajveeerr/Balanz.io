@@ -120,7 +120,7 @@ body {
     width: 50%;
     background-color: rgb(254, 254, 254);
     background-color: transparent;
-    padding: 0 5rem 0 5rem
+    padding: 0 7rem;
 }
 .login-section h1{
     font-size: 2rem;
@@ -312,7 +312,7 @@ form button:hover{
   .login-container {
     flex-direction: column;
     padding: 2rem;
-    height: auto;
+    height: 90vh;
   }
   .login-section {
     width: 100%;

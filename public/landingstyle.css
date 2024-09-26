@@ -34,7 +34,6 @@ body {
   backdrop-filter: blur(8px);
   background: rgba(22 22 22 .7);
     /* background: linear-gradient(rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%); */
-    border-radius: 100px;
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
 }
@@ -216,8 +215,6 @@ body {
     background-image: url("/gradBg.webp");
     background-color: #4158D0;
     background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
     /* background: rgba(32,21,21,1); */
 }
 .img-container{
@@ -226,7 +223,7 @@ body {
     /* top: 50%; */
     padding: .9rem;
     left: 50%;
-    top: -5rem;
+    top: -4rem;
     transform: translate(-50%);
     border-radius: .7rem;
     /* box-shadow: 0 15px 50px 0 rgba(0,0,0,.35); */
