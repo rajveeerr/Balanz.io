@@ -12,7 +12,7 @@ mongoose.connect('');
     todos: []
 }*/
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new schema({
     username: {type: String, unique: true, trim: true},
     name: String,
     password: String,
@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
     priority: receivedPayload.priority || 'medium'
 }; */
 
-const TodoSchema = new mongoose.Schema({
+const TodoSchema = new schema({
     name: {type: String, trim: true},
     description: {type: String, trim: true},
     due: Date,
