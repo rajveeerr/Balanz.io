@@ -9,6 +9,7 @@ const fs=require("fs");
 const path=require("path");
 const {user,todo}=require("../database/index");
 const bcrypt=require("bcrypt");
+const z=require("zod")
 
 // todoJson=path.join(__dirname,"../database/todos.json");
 
@@ -21,12 +22,29 @@ router.post('/signup',async (req, res) => {
 // {username: "user-id-generated-on-server, name: "smthn", profileImg: "generated-randomly-on-BE", todos:[]"initialised on be"}
 // received-payload: {username: "wewef", name: "asca",password: "casa"}
 
-    if(req.body.username&&req.body.password&&req.body.name){
+    //to implement zod verification
+    let validData= z.object({
+        username: z.string()
+        .min(3,"Username must be at least 3 characters long")
+        .max(30,"Username must not exceed 30 characters")
+        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, underscores"),
+        name: z.string()
+        .min(2,"Name must be at least 2 characters long")
+        .max(35,"Name must not exceed 50 characters")
+        .regex(/^[a-zA-Z\s\-]+$/, "Name can only contain letters, spaces, and hyphens"),
+        password: z
+        .min(4,"Password must be at least 4 characters long")
+        .max(30, "Password must not exceed 30 characters")
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,30}$/, 
+   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+    })
+    let validateData=validData.safeParse(req.body);
+
+    if(validateData.sucess){
 
         let username=req.body.username;
         let password=req.body.password;
-        // let userFound=allUsersData.find(user=>user.username===username);
-
+        
         try{
             // allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
             hashedPassword=await bcrypt.hash(password,saltingRounds)
@@ -37,14 +55,21 @@ router.post('/signup',async (req, res) => {
                 profileImg: profilePictures[Math.floor(Math.random()*profilePictures.length)]
             })
         }
-        catch(err){
+        catch(error){
             // fs.writeFileSync(todoJson,"[]");
+            if(error.code===11000){
+                res.status(500).json({ 
+                    message: "User with this username already exist!!"
+                });
+                return
+            }
             res.status(500).json({ 
-                message: "Internal server error. Couldn't save the data.", 
-                error: err 
+                message: "There was an error while creating the Account.", 
+                error: error
             });
             return;
         }
+        // let userFound=allUsersData.find(user=>user.username===username);
         // if(!userFound){
             // let username= uuidv4();
             // let newUser={
@@ -87,7 +112,7 @@ router.post('/signup',async (req, res) => {
     // }
     else{
         res.status(401).json({
-            message: 'Signup Incomplete, username, name, password not provided!!!',
+            message: validateData.error.issues[0].message,
         });
         return;
     }    
@@ -95,7 +120,6 @@ router.post('/signup',async (req, res) => {
      
 
 router.post("/login",(req,res)=>{
-    // Implement user login logic
     if(req.body.username&&req.body.password){
         let username=req.body.username;
         try{
