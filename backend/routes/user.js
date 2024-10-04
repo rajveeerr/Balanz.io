@@ -65,29 +65,29 @@ router.post('/signup',async (req, res) => {
             //     });
             // }
 
-            token=jwt.sign({ 
-                username: username,
-                userId: newUser._id
-            },JWT_SECRET); 
+        token=jwt.sign({ 
+            username: username,
+            userId: newUser._id
+        },JWT_SECRET); 
 
-            res.status(200).json({
-                message: `Signup Complete, for ${req.body.name}!!!`,
-                token: token,
-                profileImg: newUser.profileImg,
-                username: username
-            });
-            return;
-        }
+        res.status(200).json({
+            message: `Signup Complete, for ${req.body.name}!!!`,
+            token: token,
+            profileImg: newUser.profileImg,
+            username: username
+        });
+        return;
+    }
         // else{
         //     res.status(409).json({
         //         message: "Username already exist!!"
         //     });
         //     return;
         // }
-    }
+    // }
     else{
         res.status(401).json({
-            message: 'Signup Incomplete, username, name, password not provided!!!'
+            message: 'Signup Incomplete, username, name, password not provided!!!',
         });
         return;
     }    
