@@ -7,7 +7,7 @@ const router = Router();
 const userMiddleware = require("../middleware/user");
 const fs=require("fs");
 const path=require("path");
-const {user,todo}=require("../database/index");
+const {users,todos}=require("../database/index");
 const bcrypt=require("bcrypt");
 const z=require("zod")
 
@@ -22,23 +22,22 @@ router.post('/signup',async (req, res) => {
 // {username: "user-id-generated-on-server, name: "smthn", profileImg: "generated-randomly-on-BE", todos:[]"initialised on be"}
 // received-payload: {username: "wewef", name: "asca",password: "casa"}
 
-    //to implement zod verification
-    let validData= z.object({
+    let signupValidData= z.object({
         username: z.string()
         .min(3,"Username must be at least 3 characters long")
         .max(30,"Username must not exceed 30 characters")
         .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, underscores"),
         name: z.string()
         .min(2,"Name must be at least 2 characters long")
-        .max(35,"Name must not exceed 50 characters")
+        .max(50,"Name must not exceed 50 characters")
         .regex(/^[a-zA-Z\s\-]+$/, "Name can only contain letters, spaces, and hyphens"),
-        password: z
+        password: z.string()
         .min(4,"Password must be at least 4 characters long")
         .max(30, "Password must not exceed 30 characters")
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,30}$/, 
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,30}$/, 
    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
     })
-    let validateData=validData.safeParse(req.body);
+    let validateData=signupValidData.safeParse(req.body);
 
     if(validateData.sucess){
 
@@ -48,7 +47,7 @@ router.post('/signup',async (req, res) => {
         try{
             // allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
             hashedPassword=await bcrypt.hash(password,saltingRounds)
-            newUser=user.create({
+            newUser=users.create({
                 username: username,//will throw err if the username in not unique
                 name: req.body.name,
                 password: hashedPassword,
@@ -120,22 +119,47 @@ router.post('/signup',async (req, res) => {
      
 
 router.post("/login",(req,res)=>{
-    if(req.body.username&&req.body.password){
+
+    let loginValidData=z.object({
+        username: z.string()
+        .min(3,"Username must be at least 3 characters long")
+        .max(30,"Username must not exceed 30 characters")
+        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, underscores"),
+
+        password: z.string
+        .min(4,"Password must be at least 4 characters long")
+        .max(30, "Password must not exceed 30 characters")
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,30}$/, 
+   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+    })
+
+    let validateData=loginValidData.safeParse(req.body)
+
+    if(validateData.sucess){
         let username=req.body.username;
+        let password=req.body.password;
+
+        // let userFound=allUsersData.find(user=>user.username===username);
+        let userFound=users.findOne({username});
+        let passwordMatch=false;
         try{
-            allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
+            passwordMatch=await bcrypt.compare(password,userFound.password);
         }
         catch(e){
-            fs.writeFileSync(todoJson,"[]");
+            res.status(401).json({
+                message: `LogIn Failed!!!! ${userFound?'There was an error while verifying password.':'User doesn\'t exist! SignUp first'}`,
+            })
+            return;
         }
-        let userFound=allUsersData.find(user=>user.username===username);
-        if(userFound && userFound.password===req.body.password){
+        if(userFound&&passwordMatch){
+            
             token=jwt.sign({ 
-                username: username
+                username: username,
+                userId: newUser._id
             },JWT_SECRET); 
 
             res.json({
-                message: `User ${username} Logged In succesfully!!!!`,
+                message: `Hey ${userFound.name}!, you are Logged In!!!!`,
                 token: token,
                 username: userFound.username
             });
@@ -143,16 +167,15 @@ router.post("/login",(req,res)=>{
         }
         else{
             res.status(401).json({
-                message: `LogIn Failed!!!! as ${userFound?'Password is incorrect':'User doesn\'t exist! signup first'}`,
-                status: userFound?'Password is incorrect':'User doesn\'t exist!'
+                message: `LogIn Failed!!!! ${userFound?'Password is Incorrect':'User doesn\'t exist! SignUp first'}`,
+                status: userFound?'Password is Incorrect':'User doesn\'t exist!'
             })
             return;
         }
     }
     else{
         res.status(401).json({
-            message: "LogIn Failed!!!!",
-            status: "No Username or Password provided!!!"
+            message: validateData.error.issues[0].message//will send the error while validating input
         })
         return;
     }
@@ -174,7 +197,7 @@ router.get('/',  (req, res) => {
 });
 
 // router.post('/logout', userMiddleware, (req, res) => {
-//     // Implement logout logic
+    
 //     // no need to do this simply remove token from fe
 // });
 
