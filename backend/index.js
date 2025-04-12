@@ -1,3 +1,4 @@
+const mongoose=require('mongoose')
 const express = require("express");
 const dotenv = require("dotenv");
 const cors=require("cors");
@@ -33,7 +34,15 @@ app.get("*",(req,res)=>{
 // });
 
 
-app.listen(port, ()=> console.log(`server is running at http://localhost:${port}`));
+app.listen(port, ()=> {
+    mongoose.connect(process.env.MONGO_DB)
+    .then(()=>{
+        console.log(`server is running at http://localhost:${port}`)
+    })
+    .catch((err)=>{
+        console.log(`error in connecting to mongo db \n ${err}`)
+    })
+});
 
 setInterval(()=>{
     console.log(".");
