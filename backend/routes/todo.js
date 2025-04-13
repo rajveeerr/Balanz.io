@@ -3,11 +3,12 @@ const adminMiddleware = require("../middleware/user");
 const router = Router(); 
 const fs=require("fs");
 const path=require("path");
+const userModel=require("../database/db.js")
 
 todoJson=path.join(__dirname,"../database/todos.json");
 
 
-router.post('/tasks', adminMiddleware, (req, res) => {
+router.post('/tasks', adminMiddleware,async (req, res) => {
 //received payload will look like this, {id,name,decsription,due,category,completed,status,priority}, id will be generatd on the server and username is taken from the auth middleware
 //allUsersData=[{username: "this is basically user id",name: "smthn", profileImg: "", todos: [{id,name,description,due,category,completed,status,priority},{id,name,decsription,due,category,completed,status,priority}]},{username: "user2",todos: []}];
     
@@ -37,12 +38,11 @@ router.post('/tasks', adminMiddleware, (req, res) => {
 
     let username=req.username;
 
-    let allUsersData=req.allUsersData;//retriving the contents of json file from auth middleware
-    currentUserIndex=allUsersData.findIndex(user=>user.username===username);//finding the index of the current user in the json file
-    allUsersData[currentUserIndex]=userData; //replacing the existing user data with the updated user data containing added task
-    
+
     try{
-        fs.writeFileSync(todoJson, JSON.stringify(allUsersData));
+        let foundUser=await userModel.findOne({username:username})
+        foundUser=userData
+        await foundUser.save()
     } 
     catch(err){
         return res.status(500).json({ 
@@ -59,12 +59,12 @@ router.post('/tasks', adminMiddleware, (req, res) => {
 
 });
 
-router.put('/tasks', adminMiddleware, (req, res) => {
+router.put('/tasks', adminMiddleware,async (req, res) => {
 // user can update everything so, payload will look like this {id, name,description,due,category,completed,status,priority}
 
     let username=req.username;
-    let userData=req.userData;
-    let allUsersData=req.allUsersData;//retriving the contents of json file from auth middleware
+    let userData=req.userData; //complete user data that is username,password,profileImg,todos everything filled by the middleware
+
     let receivedPayload=req.body;
     if (!receivedPayload.name || !receivedPayload.due || !receivedPayload.category){
         return res.status(400).json({ 
@@ -75,26 +75,22 @@ router.put('/tasks', adminMiddleware, (req, res) => {
     let taskToUpdate=userData.todos.find(task=>task.id===taskIdToUpdate);
 
     if(taskToUpdate){
-
-        // receivedPayload.name?taskToUpdate.name=receivedPayload.name:null;
-        // receivedPayload.description?taskToUpdate.description=receivedPayload.description:null;
-        // receivedPayload.due?taskToUpdate.due=receivedPayload.due:null;
-        // receivedPayload.category?taskToUpdate.category=receivedPayload.category:null;
-        // receivedPayload.completed?taskToUpdate.completed=receivedPayload.completed:null;
-        // receivedPayload.status?taskToUpdate.status=receivedPayload.status:null;
-        // receivedPayload.priority?taskToUpdate.priority=receivedPayload.priority:null;
-
-        let updatedTask=Object.assign({},taskToUpdate,receivedPayload);
-    
-        let taskIndexToUpdate=userData.todos.findIndex(task=>task.id===taskIdToUpdate);//finding the index of the task/todo to update, in the userData, this --> {username: "user2",todos: []}
-        // userData.todos[updatedTaskIndex]=taskIdToUpdate; //replacing the existing task data with the updated task data
-        userData.todos[taskIndexToUpdate]=updatedTask; //replacing the existing task data with the updated task data
-        
-        currentUserIndex=allUsersData.findIndex(user=>user.username===username);//finding the index of the current user in the json file
-        allUsersData[currentUserIndex]=userData; //replacing the existing user data with the updated user data containing updated task
-        
         try{
-            fs.writeFileSync(todoJson, JSON.stringify(allUsersData));
+            await userModel.findOneAndUpdate(
+                { username: username, "todos.id": taskIdToUpdate },
+                {
+                $set: {
+                    "todos.$.name": receivedPayload.name,
+                    "todos.$.description": receivedPayload.description,
+                    "todos.$.due": receivedPayload.due,
+                    "todos.$.category": receivedPayload.category,
+                    "todos.$.completed": receivedPayload.completed,
+                    "todos.$.status": receivedPayload.status,
+                    "todos.$.priority": receivedPayload.priority
+                }
+                },
+                { new: true } // returns updated doc
+            );
         } 
         catch(err){
             return res.status(500).json({ 
@@ -143,25 +139,23 @@ router.delete('/tasks', adminMiddleware ,(req, res) => {
 
 });
 
-router.delete('/tasks/:id', adminMiddleware , (req, res) => {
+router.delete('/tasks/:id', adminMiddleware ,async (req, res) => {
     // Implement delete todo by id logic
     let username=req.username;
     let userData=req.userData;
-    let allUsersData=req.allUsersData;
     let taskIdToDelete=req.params.id;
     let taskToDelete=userData.todos.find(task=>task.id===taskIdToDelete);
 
     if(taskToDelete){
-
-        userData.todos=userData.todos.filter(task=>task.id!=taskIdToDelete);
-        
-        currentUserIndex=allUsersData.findIndex(user=>user.username===username);
-        allUsersData[currentUserIndex]=userData;//updating the changed user data in all users data 
-        
         try{
-            fs.writeFileSync(todoJson, JSON.stringify(allUsersData));
+            await userModel.updateOne(
+                { username: username },
+                { $pull: { todos: { id: taskIdToDelete } } } 
+            );            
         } 
         catch(err){
+            console.log(err);
+            
             return res.status(500).json({ 
                 message: "Internal server error. Couldn't save the data.", 
                 error: err 
