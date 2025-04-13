@@ -44,6 +44,3 @@ app.listen(port, ()=> {
     })
 });
 
-setInterval(()=>{
-    console.log(".");
-},5000)

@@ -211,7 +211,8 @@ router.get('/tasks/:id', adminMiddleware , (req, res) => {
 router.get("/me", adminMiddleware ,(req,res)=>{//for displaying username and profile image
     username=req.username;
     userData=req.userData;
-    res.json({
+    
+    res.status(200).json({
         username: username,
         name: userData.name,
         profileImg: userData.profileImg,
