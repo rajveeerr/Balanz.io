@@ -8,6 +8,7 @@ const userMiddleware = require("../middleware/user");
 const fs=require("fs");
 const path=require("path");
 const { profile } = require("console");
+const userModel=require("../database/db.js")
 
 todoJson=path.join(__dirname,"../database/todos.json");
 let allUsersData=[];
@@ -15,33 +16,27 @@ let allUsersData=[];
 const profilePictures=["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg","11.jpg","12.jpg"];
 
 // User Routes
-router.post('/signup', (req, res) => {
+router.post('/signup',async (req, res) => {
     // Implement user signup logic
 // user data looks like this = [{username: "this is basically user id",password: "", name: "smthn", profileImg: "", todos: [{id,name,description,due,category,completed,status,priority},{id,name,decsription,due,category,completed,status,priority}]},{username: "user2",todos: []}];
 // {username: "user-id-generated-on-server, name: "smthn", profileImg: "generated-randomly-on-BE", todos:[]"initialised on be"}
 // received-payload: {username: "wewef", name: "asca",password: "casa"}
 
     if(req.body.username&&req.body.password&&req.body.name){
-        try{
-            allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
-        }
-        catch(e){
-            fs.writeFileSync(todoJson,"[]");
-        }
-        let username=req.body.username;
-        let userFound=allUsersData.find(user=>user.username===username);
+        let incomingUsername=req.body.username;
+        let userFound=await userModel.findOne({username:incomingUsername});
         if(!userFound){
             // let username= uuidv4();
             let newUser={
-                username: username,
+                username: incomingUsername,
                 name: req.body.name,
                 password: req.body.password,
                 profileImg: profilePictures[Math.floor(Math.random()*profilePictures.length)],
                 todos: []
             }
-            allUsersData.push(newUser);
+            
             try{
-                fs.writeFileSync(todoJson, JSON.stringify(allUsersData));
+                await userModel.create(newUser)
             } 
             catch(err){
                 return res.status(500).json({ 
@@ -50,14 +45,14 @@ router.post('/signup', (req, res) => {
                 });
             }
             token=jwt.sign({ 
-                username: username
+                username: incomingUsername
             },JWT_SECRET); 
 
             res.status(200).json({
                 message: `Signup Complete, for ${req.body.name}!!!`,
                 token: token,
                 profileImg: newUser.profileImg,
-                username: username
+                username: incomingUsername
             });
             return;
         }
@@ -77,17 +72,11 @@ router.post('/signup', (req, res) => {
 });
      
 
-router.post("/login",(req,res)=>{
+router.post("/login",async (req,res)=>{
     // Implement user login logic
     if(req.body.username&&req.body.password){
         let username=req.body.username;
-        try{
-            allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
-        }
-        catch(e){
-            fs.writeFileSync(todoJson,"[]");
-        }
-        let userFound=allUsersData.find(user=>user.username===username);
+        let userFound=await userModel.findOne({username:username})
         if(userFound && userFound.password===req.body.password){
             token=jwt.sign({ 
                 username: username

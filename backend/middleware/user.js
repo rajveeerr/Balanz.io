@@ -4,27 +4,20 @@ dotenv.config();
 const JWT_SECRET= process.env.JWT_SECRET;
 const fs=require("fs");
 const path=require("path");
+const userModel=require("../database/db.js")
 
 todoJson=path.join(__dirname,"../database/todos.json");
-let allUsersData=[];
 
-function userMiddleware(req, res, next) {
+async function userMiddleware(req, res, next) {
     // Implement user auth logic
     reqToken=req.headers.authorization;
     if(reqToken){
         try{
             let username=jwt.verify(reqToken,JWT_SECRET).username;
-            try{
-                allUsersData=JSON.parse(fs.readFileSync(todoJson,"utf-8"));
-            }
-            catch(e){
-                fs.writeFileSync(todoJson,"[]");
-            }
-            let userFound=allUsersData.find(user=>user.username===username)
+            let userFound=await userModel.findOne({username:username})
             if(userFound){
                 req.username=username;
                 req.userData=userFound;
-                req.allUsersData=allUsersData;
                 next();
             }
             else{
